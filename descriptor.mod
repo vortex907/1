@@ -1,0 +1,17 @@
+version="1"
+tags={
+	"Alternative History"
+	"Events"
+	"Gameplay"
+	"Historical"
+	"Map"
+	"Technologies"
+	"National Focuses"
+	"Military"
+	"Ideologies"
+	"Graphics"
+}
+name="Storm In Europa"
+picture="thumbnail.png"
+supported_version="1.16.9"
+remote_file_id="3505239348"
