@@ -102,6 +102,15 @@ local RE_StealResult     = makeEvent("StealResult")       -- server->client: ste
 local RE_SyncBase        = makeEvent("SyncBase")          -- server->client: base brainot list
 local RE_RequestOtherBase = makeEvent("RequestOtherBase")
 local RE_SendOtherBase    = makeEvent("SendOtherBase")
+local RE_BuyClickStrength = makeEvent("BuyClickStrength")
+local RE_SyncClickStrength = makeEvent("SyncClickStrength")
+
+-- ============================================================
+-- STORE PRICING
+-- ============================================================
+
+local CLICK_STRENGTH_BASE_COST = 500  -- first upgrade costs 500
+local CLICK_STRENGTH_COST_MULT = 1.5   -- each level costs 1.5x more (500, 750, 1125...)
 
 -- ============================================================
 -- DATA
@@ -163,6 +172,28 @@ local function updateMoney(player, amount)
 	if ls then local m=ls:FindFirstChild("Money"); if m then m.Value=d.money end end
 	RE_UpdateMoney:FireClient(player, d.money)
 end
+
+local function syncClickStrength(player)
+	local d = playerData[player]; if not d then return end
+	RE_SyncClickStrength:FireClient(player, d.clickStrength)
+end
+
+-- ============================================================
+-- STORE - BUY CLICK STRENGTH
+-- ============================================================
+
+RE_BuyClickStrength.OnServerEvent:Connect(function(player)
+	local d = playerData[player]; if not d then return end
+	local current = math.max(1, d.clickStrength or 1)
+	local cost = math.floor(CLICK_STRENGTH_BASE_COST * (CLICK_STRENGTH_COST_MULT ^ (current - 1)))
+	if d.money < cost then return end
+	d.money = d.money - cost
+	d.clickStrength = current + 1
+	updateMoney(player, d.money)
+	syncClickStrength(player)
+	saveData(player)
+	print(player.Name .. " bought Click Strength " .. d.clickStrength .. " for $" .. cost)
+end)
 
 -- ============================================================
 -- BASE SYSTEM
@@ -775,6 +806,7 @@ Players.PlayerAdded:Connect(function(player)
 		RE_UpdateMoney:FireClient(player, d.money)
 		RE_SyncInventory:FireClient(player, d.inventory)
 		syncBaseToClient(player)
+		syncClickStrength(player)
 
 		local baseName = assignedBases[player]
 		if baseName then

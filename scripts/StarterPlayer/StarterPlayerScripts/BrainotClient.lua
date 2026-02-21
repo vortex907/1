@@ -26,6 +26,7 @@ local RE_StealResult     = Remotes:WaitForChild("StealResult")
 local RE_SyncBase          = Remotes:WaitForChild("SyncBase")
 local RE_RequestOtherBase  = Remotes:WaitForChild("RequestOtherBase")
 local RE_SendOtherBase     = Remotes:WaitForChild("SendOtherBase")
+local RE_SyncClickStrength = Remotes:WaitForChild("SyncClickStrength")
 
 local MAX_BASE_SLOTS = 20
 local BRAINOT_MONEY = {
@@ -54,6 +55,7 @@ local currentInventory = {}
 local currentBase      = {}
 local totalIncome      = 0
 local placingCooldown  = false
+local myClickStrength  = 1
 
 -- ============================================================
 -- ROOT GUI
@@ -93,18 +95,36 @@ local function toast(text, color)
 end
 
 -- ============================================================
--- MONEY HUD  (top centre)
+-- TOP STATS BAR (money + click strength - saved stats)
 -- ============================================================
 
-local moneyFrame=Instance.new("Frame"); moneyFrame.Size=UDim2.new(0,220,0,68)
-moneyFrame.Position=UDim2.new(0.5,-110,0,10); moneyFrame.BackgroundColor3=Color3.fromRGB(8,8,20)
-moneyFrame.BorderSizePixel=0; moneyFrame.Parent=sg; corner(moneyFrame,12); stroke(moneyFrame,Color3.fromRGB(255,210,50))
+local statsBar=Instance.new("Frame"); statsBar.Size=UDim2.new(0,380,0,72)
+statsBar.Position=UDim2.new(0.5,-190,0,10); statsBar.BackgroundColor3=Color3.fromRGB(8,8,22)
+statsBar.BorderSizePixel=0; statsBar.Parent=sg; corner(statsBar,14); stroke(statsBar,Color3.fromRGB(255,200,60),3)
 
-local moneyIcon=label(moneyFrame,"$",UDim2.new(0,40,0.56,0),Enum.Font.GothamBold,Color3.fromRGB(255,210,50))
-local moneyAmt =label(moneyFrame,"0",UDim2.new(1,-50,0.56,0),Enum.Font.GothamBold,Color3.fromRGB(255,255,255),Enum.TextXAlignment.Left)
-moneyAmt.Position=UDim2.new(0,44,0,0)
-local incomeLabel=label(moneyFrame,"Place Brainots to earn!",UDim2.new(1,-10,0.38,0),Enum.Font.Gotham,Color3.fromRGB(80,200,120),Enum.TextXAlignment.Left)
+-- Money section
+local moneyFrame=Instance.new("Frame"); moneyFrame.Size=UDim2.new(0,200,0,56)
+moneyFrame.Position=UDim2.new(0,10,0,8); moneyFrame.BackgroundColor3=Color3.fromRGB(15,12,30)
+moneyFrame.BorderSizePixel=0; moneyFrame.Parent=statsBar; corner(moneyFrame,10); stroke(moneyFrame,Color3.fromRGB(255,210,50),2)
+local moneyIcon=label(moneyFrame,"$",UDim2.new(0,36,0.6,0),Enum.Font.GothamBold,Color3.fromRGB(255,210,50))
+local moneyAmt =label(moneyFrame,"0",UDim2.new(1,-44,0.6,0),Enum.Font.GothamBlack,Color3.fromRGB(255,255,255),Enum.TextXAlignment.Left)
+moneyAmt.Position=UDim2.new(0,38,0,0)
+local incomeLabel=label(moneyFrame,"Place Brainots to earn!",UDim2.new(1,-8,0.35,0),Enum.Font.Gotham,Color3.fromRGB(80,200,120),Enum.TextXAlignment.Left)
 incomeLabel.Position=UDim2.new(0,8,0.58,0)
+
+-- Click strength badge (saved upgrade)
+local powerFrame=Instance.new("Frame"); powerFrame.Size=UDim2.new(0,140,0,56)
+powerFrame.Position=UDim2.new(0,218,0,8); powerFrame.BackgroundColor3=Color3.fromRGB(18,15,35)
+powerFrame.BorderSizePixel=0; powerFrame.Parent=statsBar; corner(powerFrame,10); stroke(powerFrame,Color3.fromRGB(180,100,255),2)
+local powerTitleLbl=label(powerFrame,"POWER",UDim2.new(1,-8,0.35,0),Enum.Font.GothamBold,Color3.fromRGB(150,120,200),Enum.TextXAlignment.Left)
+powerTitleLbl.Position=UDim2.new(0,8,0,2)
+local powerValLbl=label(powerFrame,"1",UDim2.new(1,-8,0.55,0),Enum.Font.GothamBlack,Color3.fromRGB(255,220,100),Enum.TextXAlignment.Left)
+powerValLbl.Position=UDim2.new(0,8,0,28)
+local savedLbl=label(powerFrame,"SAVED",UDim2.new(0,52,0,18),Enum.Font.GothamBold,Color3.fromRGB(80,200,100))
+savedLbl.Position=UDim2.new(1,-60,0,4); savedLbl.BackgroundColor3=Color3.fromRGB(25,60,35); savedLbl.BackgroundTransparency=0
+corner(savedLbl,4)
+
+-- Old moneyFrame pulse ref - now pulse statsBar
 
 -- ============================================================
 -- BASE HUD (top left)
@@ -128,8 +148,8 @@ local function sideBtn(text, yPos, col)
 	b.TextScaled=true; b.Font=Enum.Font.GothamBold; b.Parent=sg; corner(b,10); return b
 end
 
-local invBtn  = sideBtn("Inventory", 66,  Color3.fromRGB(25,25,50))
-local baseBtn = sideBtn("My Base",   118, Color3.fromRGB(20,40,25))
+local invBtn  = sideBtn("Inventory", 90,  Color3.fromRGB(25,25,50))
+local baseBtn = sideBtn("My Base",   142, Color3.fromRGB(20,40,25))
 stroke(invBtn, Color3.fromRGB(100,100,220)); stroke(baseBtn, Color3.fromRGB(60,180,80))
 
 -- ============================================================
@@ -701,8 +721,13 @@ end)
 RE_UpdateMoney.OnClientEvent:Connect(function(amount)
 	moneyAmt.Text=tostring(amount)
 	if totalIncome>0 then incomeLabel.Text="+"..totalIncome.."/5s from base" end
-	TweenService:Create(moneyFrame,TweenInfo.new(0.12,Enum.EasingStyle.Back),{Size=UDim2.new(0,238,0,74)}):Play()
-	task.delay(0.12,function() TweenService:Create(moneyFrame,TweenInfo.new(0.12),{Size=UDim2.new(0,220,0,68)}):Play() end)
+	TweenService:Create(statsBar,TweenInfo.new(0.12,Enum.EasingStyle.Back),{Size=UDim2.new(0,398,0,80)}):Play()
+	task.delay(0.12,function() TweenService:Create(statsBar,TweenInfo.new(0.12),{Size=UDim2.new(0,380,0,72)}):Play() end)
+end)
+
+RE_SyncClickStrength.OnClientEvent:Connect(function(level)
+	myClickStrength=math.max(1,level or 1)
+	powerValLbl.Text=tostring(myClickStrength)
 end)
 
 RE_SyncInventory.OnClientEvent:Connect(function(inv)
