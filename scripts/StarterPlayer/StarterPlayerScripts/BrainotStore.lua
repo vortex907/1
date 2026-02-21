@@ -49,7 +49,7 @@ local function findStorePart()
 end
 
 -- ============================================================
--- GUI STYLING (brainrot style - bold, chunky, no emojis)
+-- STORE GUI (clean, matches main HUD)
 -- ============================================================
 
 local sg = Instance.new("ScreenGui")
@@ -60,151 +60,114 @@ sg.Parent = player.PlayerGui
 
 local function corner(parent, r)
 	local c = Instance.new("UICorner", parent)
-	c.CornerRadius = UDim.new(0, r or 12)
+	c.CornerRadius = UDim.new(0, r or 8)
 	return c
 end
 
-local function stroke(parent, color, thick)
-	local s = Instance.new("UIStroke", parent)
-	s.Color = color
-	s.Thickness = thick or 3
-	return s
-end
-
--- ============================================================
--- STORE PANEL
--- ============================================================
-
 local storePanel = Instance.new("Frame")
 storePanel.Name = "StorePanel"
-storePanel.Size = UDim2.new(0, 420, 0, 340)
-storePanel.Position = UDim2.new(0.5, -210, 0.5, -170)
-storePanel.BackgroundColor3 = Color3.fromRGB(12, 10, 28)
+storePanel.Size = UDim2.new(0, 340, 0, 220)
+storePanel.Position = UDim2.new(0.5, -170, 0.5, -110)
+storePanel.BackgroundColor3 = Color3.fromRGB(20, 20, 32)
 storePanel.BorderSizePixel = 0
 storePanel.Visible = false
 storePanel.Parent = sg
-corner(storePanel, 16)
-stroke(storePanel, Color3.fromRGB(255, 180, 50), 4)
-
--- Dark inner border
-local innerGlow = Instance.new("UIStroke", storePanel)
-innerGlow.Color = Color3.fromRGB(80, 60, 20)
-innerGlow.Thickness = 1
-innerGlow.Transparency = 0.5
+corner(storePanel, 10)
+local panelStroke = Instance.new("UIStroke", storePanel)
+panelStroke.Color = Color3.fromRGB(70, 70, 100)
+panelStroke.Thickness = 1
 
 -- Header
 local storeHdr = Instance.new("Frame")
-storeHdr.Size = UDim2.new(1, 0, 0, 56)
-storeHdr.BackgroundColor3 = Color3.fromRGB(25, 18, 45)
+storeHdr.Size = UDim2.new(1, 0, 0, 44)
+storeHdr.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
 storeHdr.BorderSizePixel = 0
 storeHdr.Parent = storePanel
-corner(storeHdr, 16)
-
-local headerStripe = Instance.new("Frame")
-headerStripe.Size = UDim2.new(1, 0, 0, 8)
-headerStripe.Position = UDim2.new(0, 0, 0, 0)
-headerStripe.BackgroundColor3 = Color3.fromRGB(255, 180, 50)
-headerStripe.BorderSizePixel = 0
-headerStripe.Parent = storeHdr
-corner(headerStripe, 16)
+corner(storeHdr, 10)
 
 local storeTitle = Instance.new("TextLabel")
-storeTitle.Size = UDim2.new(1, -20, 1, -12)
-storeTitle.Position = UDim2.new(0, 14, 0, 8)
+storeTitle.Size = UDim2.new(1, -55, 1, 0)
+storeTitle.Position = UDim2.new(0, 12, 0, 0)
 storeTitle.BackgroundTransparency = 1
-storeTitle.Text = "UPGRADES"
-storeTitle.TextColor3 = Color3.fromRGB(255, 210, 80)
+storeTitle.Text = "STORE"
+storeTitle.TextColor3 = Color3.fromRGB(200, 190, 160)
 storeTitle.TextScaled = true
-storeTitle.Font = Enum.Font.GothamBlack
+storeTitle.Font = Enum.Font.GothamBold
 storeTitle.TextXAlignment = Enum.TextXAlignment.Left
 storeTitle.Parent = storeHdr
 
-local savedBadge = Instance.new("TextLabel")
-savedBadge.Size = UDim2.new(0, 90, 0, 24)
-savedBadge.Position = UDim2.new(1, -100, 0, 16)
-savedBadge.BackgroundColor3 = Color3.fromRGB(30, 80, 40)
-savedBadge.BorderSizePixel = 0
-savedBadge.Text = "SAVED"
-savedBadge.TextColor3 = Color3.fromRGB(100, 255, 140)
-savedBadge.TextScaled = true
-savedBadge.Font = Enum.Font.GothamBold
-savedBadge.Parent = storeHdr
-corner(savedBadge, 6)
-stroke(savedBadge, Color3.fromRGB(60, 180, 80), 1)
-
--- Close button
 local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 40, 0, 40)
-closeBtn.Position = UDim2.new(1, -48, 0, 8)
-closeBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeBtn.Size = UDim2.new(0, 36, 0, 36)
+closeBtn.Position = UDim2.new(1, -44, 0, 4)
+closeBtn.BackgroundColor3 = Color3.fromRGB(90, 50, 50)
 closeBtn.BorderSizePixel = 0
 closeBtn.Text = "X"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.TextColor3 = Color3.fromRGB(255, 200, 200)
 closeBtn.TextScaled = true
-closeBtn.Font = Enum.Font.GothamBlack
+closeBtn.Font = Enum.Font.GothamBold
 closeBtn.Parent = storeHdr
-corner(closeBtn, 8)
+corner(closeBtn, 6)
 
--- Click Strength upgrade card
+-- Upgrade card
 local upgradeCard = Instance.new("Frame")
-upgradeCard.Size = UDim2.new(1, -24, 0, 110)
-upgradeCard.Position = UDim2.new(0, 12, 0, 68)
-upgradeCard.BackgroundColor3 = Color3.fromRGB(18, 15, 38)
+upgradeCard.Size = UDim2.new(1, -24, 0, 88)
+upgradeCard.Position = UDim2.new(0, 12, 0, 56)
+upgradeCard.BackgroundColor3 = Color3.fromRGB(28, 28, 48)
 upgradeCard.BorderSizePixel = 0
 upgradeCard.Parent = storePanel
-corner(upgradeCard, 12)
-stroke(upgradeCard, Color3.fromRGB(120, 100, 200), 2)
-
-local cardStripe = Instance.new("Frame")
-cardStripe.Size = UDim2.new(1, 0, 0, 6)
-cardStripe.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
-cardStripe.BorderSizePixel = 0
-cardStripe.Parent = upgradeCard
-corner(cardStripe, 12)
+corner(upgradeCard, 8)
 
 local powerTitle = Instance.new("TextLabel")
-powerTitle.Size = UDim2.new(1, -20, 0, 28)
-powerTitle.Position = UDim2.new(0, 12, 0, 12)
+powerTitle.Size = UDim2.new(0, 140, 0, 22)
+powerTitle.Position = UDim2.new(0, 12, 0, 10)
 powerTitle.BackgroundTransparency = 1
 powerTitle.Text = "CLICK STRENGTH"
-powerTitle.TextColor3 = Color3.fromRGB(200, 170, 255)
+powerTitle.TextColor3 = Color3.fromRGB(160, 155, 180)
 powerTitle.TextScaled = true
-powerTitle.Font = Enum.Font.GothamBold
+powerTitle.Font = Enum.Font.Gotham
 powerTitle.TextXAlignment = Enum.TextXAlignment.Left
 powerTitle.Parent = upgradeCard
 
 local powerVal = Instance.new("TextLabel")
-powerVal.Size = UDim2.new(0, 120, 0, 26)
-powerVal.Position = UDim2.new(0, 12, 0, 42)
-powerVal.BackgroundColor3 = Color3.fromRGB(40, 30, 70)
-powerVal.BorderSizePixel = 0
-powerVal.Text = "Power: 1"
-powerVal.TextColor3 = Color3.fromRGB(255, 220, 100)
+powerVal.Size = UDim2.new(0, 50, 0, 28)
+powerVal.Position = UDim2.new(0, 12, 0, 36)
+powerVal.BackgroundTransparency = 1
+powerVal.Text = "1"
+powerVal.TextColor3 = Color3.fromRGB(220, 210, 170)
 powerVal.TextScaled = true
 powerVal.Font = Enum.Font.GothamBold
+powerVal.TextXAlignment = Enum.TextXAlignment.Left
 powerVal.Parent = upgradeCard
-corner(powerVal, 6)
-stroke(powerVal, Color3.fromRGB(255, 180, 50), 1)
+
+local descLbl = Instance.new("TextLabel")
+descLbl.Size = UDim2.new(0, 100, 0, 32)
+descLbl.Position = UDim2.new(0, 65, 0, 34)
+descLbl.BackgroundTransparency = 1
+descLbl.Text = "slightly faster capture"
+descLbl.TextColor3 = Color3.fromRGB(110, 110, 130)
+descLbl.TextScaled = true
+descLbl.Font = Enum.Font.Gotham
+descLbl.TextXAlignment = Enum.TextXAlignment.Left
+descLbl.Parent = upgradeCard
 
 local buyBtn = Instance.new("TextButton")
-buyBtn.Size = UDim2.new(0, 160, 0, 44)
-buyBtn.Position = UDim2.new(1, -172, 0.5, -22)
-buyBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 80)
+buyBtn.Size = UDim2.new(0, 120, 0, 40)
+buyBtn.Position = UDim2.new(1, -132, 0.5, -20)
+buyBtn.BackgroundColor3 = Color3.fromRGB(50, 120, 70)
 buyBtn.BorderSizePixel = 0
 buyBtn.Text = "BUY $500"
 buyBtn.TextColor3 = Color3.new(1, 1, 1)
 buyBtn.TextScaled = true
-buyBtn.Font = Enum.Font.GothamBlack
+buyBtn.Font = Enum.Font.GothamBold
 buyBtn.Parent = upgradeCard
-corner(buyBtn, 10)
-stroke(buyBtn, Color3.fromRGB(80, 255, 120), 2)
+corner(buyBtn, 6)
 
 local hintLbl = Instance.new("TextLabel")
-hintLbl.Size = UDim2.new(1, -24, 0, 36)
-hintLbl.Position = UDim2.new(0, 12, 0, 190)
+hintLbl.Size = UDim2.new(1, -24, 0, 48)
+hintLbl.Position = UDim2.new(0, 12, 0, 152)
 hintLbl.BackgroundTransparency = 1
-hintLbl.Text = "Each click in capture counts for more. Get closer to the Store brick to open."
-hintLbl.TextColor3 = Color3.fromRGB(120, 110, 150)
+hintLbl.Text = "Walk up to the Store brick to open. Each upgrade makes captures slightly easier."
+hintLbl.TextColor3 = Color3.fromRGB(90, 90, 110)
 hintLbl.TextScaled = true
 hintLbl.Font = Enum.Font.Gotham
 hintLbl.TextWrapped = true
@@ -220,10 +183,10 @@ local function updateCostDisplay()
 	local cost = math.floor(CLICK_STRENGTH_BASE_COST * (CLICK_STRENGTH_COST_MULT ^ (myClickStrength - 1)))
 	buyBtn.Text = "BUY $" .. cost
 	if myMoney < cost then
-		buyBtn.BackgroundColor3 = Color3.fromRGB(80, 50, 50)
-		buyBtn.TextColor3 = Color3.fromRGB(180, 140, 140)
+		buyBtn.BackgroundColor3 = Color3.fromRGB(60, 55, 55)
+		buyBtn.TextColor3 = Color3.fromRGB(140, 130, 130)
 	else
-		buyBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 80)
+		buyBtn.BackgroundColor3 = Color3.fromRGB(50, 120, 70)
 		buyBtn.TextColor3 = Color3.new(1, 1, 1)
 	end
 end
@@ -232,16 +195,15 @@ local function openStore()
 	if storeGuiVisible then return end
 	storeGuiVisible = true
 	storePanel.Visible = true
-	storePanel.Position = UDim2.new(0.5, -210, 0.5, -120)
-	TweenService:Create(storePanel, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-		{Position = UDim2.new(0.5, -210, 0.5, -170)}):Play()
+	storePanel.Position = UDim2.new(0.5, -170, 0.5, -80)
+	TweenService:Create(storePanel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Position = UDim2.new(0.5, -170, 0.5, -110)}):Play()
 end
 
 local function closeStore()
 	if not storeGuiVisible then return end
 	storeGuiVisible = false
-	TweenService:Create(storePanel, TweenInfo.new(0.15), {Position = UDim2.new(0.5, -210, 0.5, -120)}):Play()
-	task.delay(0.18, function()
+	TweenService:Create(storePanel, TweenInfo.new(0.15), {Position = UDim2.new(0.5, -170, 0.5, -80)}):Play()
+	task.delay(0.16, function()
 		storePanel.Visible = false
 	end)
 end
@@ -283,7 +245,7 @@ end)
 
 RE_SyncClickStrength.OnClientEvent:Connect(function(level)
 	myClickStrength = math.max(1, level or 1)
-	powerVal.Text = "Power: " .. myClickStrength
+	powerVal.Text = tostring(myClickStrength)
 	updateCostDisplay()
 end)
 
