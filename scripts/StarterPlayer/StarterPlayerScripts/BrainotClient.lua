@@ -123,20 +123,18 @@ moneyAmt.Position=UDim2.new(0,30,0,0)
 local incomeLabel=label(moneyFrame,"+0/5s",UDim2.new(1,-8,0.4,0),Enum.Font.Gotham,Color3.fromRGB(100,180,120),Enum.TextXAlignment.Right)
 incomeLabel.Position=UDim2.new(0,4,0.55,0)
 
--- Power (saved)
+-- Power
 local powerFrame=Instance.new("Frame")
-powerFrame.Size=UDim2.new(0,140,0,38)
+powerFrame.Size=UDim2.new(0,120,0,38)
 powerFrame.Position=UDim2.new(0,170,0,7)
 powerFrame.BackgroundColor3=Color3.fromRGB(28,32,48)
 powerFrame.BorderSizePixel=0
 powerFrame.Parent=statsBar
 corner(powerFrame,6)
-local powerTitleLbl=label(powerFrame,"CLICK",UDim2.new(0,50,0.4,0),Enum.Font.Gotham,Color3.fromRGB(140,150,180),Enum.TextXAlignment.Left)
-powerTitleLbl.Position=UDim2.new(0,8,0,2)
-local powerValLbl=label(powerFrame,"1",UDim2.new(1,-50,1,0),Enum.Font.GothamBold,Color3.fromRGB(220,210,150),Enum.TextXAlignment.Right)
+local powerTitleLbl=label(powerFrame,"CLICK",UDim2.new(0,55,0.5,0),Enum.Font.Gotham,Color3.fromRGB(140,150,180),Enum.TextXAlignment.Left)
+powerTitleLbl.Position=UDim2.new(0,8,0,0)
+local powerValLbl=label(powerFrame,"1",UDim2.new(1,-60,1,0),Enum.Font.GothamBold,Color3.fromRGB(220,210,150),Enum.TextXAlignment.Right)
 powerValLbl.Position=UDim2.new(0,0,0,0)
-local savedLbl=label(powerFrame,"saved",UDim2.new(0,36,0,14),Enum.Font.Gotham,Color3.fromRGB(80,160,100))
-savedLbl.Position=UDim2.new(0,8,0.5,0)
 
 -- ============================================================
 -- BASE HUD (top left)
