@@ -98,9 +98,16 @@ end
 -- TOP STATS BAR (clean, minimal)
 -- ============================================================
 
+local function formatShort(n)
+	if n < 1000 then return tostring(n) end
+	if n < 1000000 then return string.format("%.1fK", n/1000) end
+	if n < 1000000000 then return string.format("%.1fM", n/1000000) end
+	return string.format("%.1fB", n/1000000000)
+end
+
 local statsBar=Instance.new("Frame")
-statsBar.Size=UDim2.new(0,320,0,52)
-statsBar.Position=UDim2.new(0.5,-160,0,14)
+statsBar.Size=UDim2.new(0,340,0,52)
+statsBar.Position=UDim2.new(0.5,-170,0,14)
 statsBar.BackgroundColor3=Color3.fromRGB(18,18,28)
 statsBar.BorderSizePixel=0
 statsBar.Parent=sg
@@ -111,30 +118,31 @@ statsStroke.Thickness=1
 
 -- Money
 local moneyFrame=Instance.new("Frame")
-moneyFrame.Size=UDim2.new(0,155,0,38)
+moneyFrame.Size=UDim2.new(0,175,0,38)
 moneyFrame.Position=UDim2.new(0,8,0,7)
 moneyFrame.BackgroundColor3=Color3.fromRGB(28,28,42)
 moneyFrame.BorderSizePixel=0
 moneyFrame.Parent=statsBar
 corner(moneyFrame,6)
-local moneyIcon=label(moneyFrame,"$",UDim2.new(0,28,1,0),Enum.Font.GothamBold,Color3.fromRGB(200,180,80))
-local moneyAmt=label(moneyFrame,"0",UDim2.new(1,-36,1,0),Enum.Font.GothamBold,Color3.fromRGB(255,255,255),Enum.TextXAlignment.Left)
-moneyAmt.Position=UDim2.new(0,30,0,0)
-local incomeLabel=label(moneyFrame,"+0/5s",UDim2.new(1,-8,0.4,0),Enum.Font.Gotham,Color3.fromRGB(100,180,120),Enum.TextXAlignment.Right)
-incomeLabel.Position=UDim2.new(0,4,0.55,0)
+local moneyIcon=label(moneyFrame,"$",UDim2.new(0,24,0.5,0),Enum.Font.GothamBold,Color3.fromRGB(200,180,80))
+moneyIcon.Position=UDim2.new(0,6,0,0)
+local moneyAmt=label(moneyFrame,"0",UDim2.new(0,68,0,22),Enum.Font.GothamBold,Color3.fromRGB(255,255,255),Enum.TextXAlignment.Left)
+moneyAmt.Position=UDim2.new(0,28,0,2)
+local incomeLabel=label(moneyFrame,"+0/5s",UDim2.new(1,-78,0,16),Enum.Font.Gotham,Color3.fromRGB(100,180,120),Enum.TextXAlignment.Right)
+incomeLabel.Position=UDim2.new(0,8,0,22)
 
--- Power
+-- Power (CLICK above, number below - no overlap)
 local powerFrame=Instance.new("Frame")
-powerFrame.Size=UDim2.new(0,120,0,38)
-powerFrame.Position=UDim2.new(0,170,0,7)
+powerFrame.Size=UDim2.new(0,95,0,38)
+powerFrame.Position=UDim2.new(0,190,0,7)
 powerFrame.BackgroundColor3=Color3.fromRGB(28,32,48)
 powerFrame.BorderSizePixel=0
 powerFrame.Parent=statsBar
 corner(powerFrame,6)
-local powerTitleLbl=label(powerFrame,"CLICK",UDim2.new(0,55,0.5,0),Enum.Font.Gotham,Color3.fromRGB(140,150,180),Enum.TextXAlignment.Left)
-powerTitleLbl.Position=UDim2.new(0,8,0,0)
-local powerValLbl=label(powerFrame,"1",UDim2.new(1,-60,1,0),Enum.Font.GothamBold,Color3.fromRGB(220,210,150),Enum.TextXAlignment.Right)
-powerValLbl.Position=UDim2.new(0,0,0,0)
+local powerTitleLbl=label(powerFrame,"CLICK",UDim2.new(1,-12,0,14),Enum.Font.Gotham,Color3.fromRGB(140,150,180),Enum.TextXAlignment.Center)
+powerTitleLbl.Position=UDim2.new(0,6,0,2)
+local powerValLbl=label(powerFrame,"1",UDim2.new(1,-12,0,20),Enum.Font.GothamBold,Color3.fromRGB(220,210,150),Enum.TextXAlignment.Center)
+powerValLbl.Position=UDim2.new(0,6,0,18)
 
 -- ============================================================
 -- BASE HUD (top left)
@@ -731,10 +739,8 @@ RE_AssignBase.OnClientEvent:Connect(function(baseName)
 end)
 
 RE_UpdateMoney.OnClientEvent:Connect(function(amount)
-	moneyAmt.Text=tostring(amount)
-	if totalIncome>0 then incomeLabel.Text="+"..totalIncome.."/5s" end
-	TweenService:Create(statsBar,TweenInfo.new(0.1),{Size=UDim2.new(0,335,0,58)}):Play()
-	task.delay(0.12,function() TweenService:Create(statsBar,TweenInfo.new(0.1),{Size=UDim2.new(0,320,0,52)}):Play() end)
+	moneyAmt.Text=formatShort(amount)
+	if totalIncome>0 then incomeLabel.Text="+"..formatShort(totalIncome).."/5s" end
 end)
 
 RE_SyncClickStrength.OnClientEvent:Connect(function(level)
@@ -750,13 +756,13 @@ RE_SyncBase.OnClientEvent:Connect(function(placed)
 	buildBaseUI(placed)
 	totalIncome=0
 	for _,item in ipairs(placed) do totalIncome+=mpsVal(item.name,item.tier) end
-	incomeLabel.Text=totalIncome>0 and ("+"..totalIncome.."/5s") or "place to earn"
+	incomeLabel.Text=totalIncome>0 and ("+"..formatShort(totalIncome).."/5s") or "place to earn"
 end)
 
 RE_PlacementResult.OnClientEvent:Connect(function(success, msg, mps)
 	placingCooldown=false
 	if success and mps and mps>0 then
-		totalIncome+=mps; incomeLabel.Text="+"..totalIncome.."/5s from base"
+		totalIncome+=mps; incomeLabel.Text="+"..formatShort(totalIncome).."/5s"
 		toast(msg.." placed!  +$"..mps.."/5s", Color3.fromRGB(80,220,120))
 	elseif success then
 		toast(msg, Color3.fromRGB(80,220,120))
